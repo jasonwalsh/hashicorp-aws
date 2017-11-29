@@ -1,0 +1,1 @@
+variable "bootstrap_expect" {}

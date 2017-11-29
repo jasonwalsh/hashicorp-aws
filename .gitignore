@@ -1,0 +1,11 @@
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module directory
+.terraform/
+# Cache objects
+packer_cache/
+
+# For built boxes
+*.box

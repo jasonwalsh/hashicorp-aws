@@ -1,0 +1,39 @@
+{
+  "builders": [
+    {
+      "ami_name": "consul",
+      "force_delete_snapshot": true,
+      "force_deregister": true,
+      "instance_type": "t2.small",
+      "region": "us-east-1",
+      "source_ami_filter": {
+        "filters": {
+          "name": "ubuntu/images/*ubuntu-xenial-16.04-amd64-server-*",
+          "root-device-type": "ebs",
+          "virtualization-type": "hvm"
+        },
+        "most_recent": true,
+        "owners": [
+          "099720109477"
+        ]
+      },
+      "ssh_username": "ubuntu",
+      "type": "amazon-ebs"
+    }
+  ],
+  "provisioners": [
+    {
+      "inline": [
+        "sudo apt-get update",
+        "sudo apt-get install -y python-pip",
+        "sudo pip install ansible"
+      ],
+      "type": "shell"
+    },
+    {
+      "playbook_dir": "./plays",
+      "playbook_file": "./plays/consul.yml",
+      "type": "ansible-local"
+    }
+  ]
+}
