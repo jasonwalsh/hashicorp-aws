@@ -56,6 +56,11 @@ data "template_file" "consul" {
   count = "${var.bootstrap_expect}"
 }
 
+data "template_file" "vault" {
+  template = "${file("${path.module}/templates/vault.tpl")}"
+  count    = "${var.bootstrap_expect}"
+}
+
 data "template_file" "nomad" {
   template = "${file("${path.module}/templates/nomad.tpl")}"
 
@@ -74,6 +79,11 @@ data "template_cloudinit_config" "default" {
 
   part {
     content = "${element(data.template_file.consul.*.rendered, count.index)}"
+  }
+
+  part {
+    content      = "${var.name == "server" ? element(data.template_file.vault.*.rendered, count.index) : ""}"
+    content_type = "text/x-shellscript"
   }
 
   part {
