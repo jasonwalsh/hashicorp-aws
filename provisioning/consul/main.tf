@@ -31,13 +31,26 @@ data "aws_iam_policy_document" "instance-assume-role-policy" {
   }
 }
 
+resource "aws_iam_instance_profile" "discover" {
+  role = "${aws_iam_role.discover.name}"
+}
+
+resource "aws_iam_role" "discover" {
+  assume_role_policy = "${data.aws_iam_policy_document.instance-assume-role-policy.json}"
+}
+
+resource "aws_iam_role_policy" "discover" {
+  policy = "${data.aws_iam_policy_document.discover.json}"
+  role   = "${aws_iam_role.discover.id}"
+}
+
 data "template_file" "consul" {
   template = "${file("${path.module}/templates/consul.tpl")}"
 
   vars {
-    bootstrap_expect = "${var.bootstrap_expect}"
+    bootstrap_expect = "${var.name == "server" ? var.bootstrap_expect : 0}"
     retry_join       = "[\"provider=aws tag_key=Name tag_value=consul-server\"]"
-    server           = "true"
+    server           = "${var.name == "server" ? true : false}"
   }
 
   count = "${var.bootstrap_expect}"
@@ -63,7 +76,6 @@ resource "aws_security_group" "consul" {
   }
 }
 
-# Consul Servers
 resource "aws_instance" "consul" {
   ami                  = "${data.aws_ami.consul.id}"
   iam_instance_profile = "${aws_iam_instance_profile.discover.name}"
@@ -72,23 +84,10 @@ resource "aws_instance" "consul" {
   security_groups      = ["${aws_security_group.consul.name}"]
 
   tags = {
-    Name = "consul-server"
+    Name = "consul-${var.name}"
   }
 
   user_data = "${element(data.template_file.consul.*.rendered, count.index)}"
 
   count = "${var.bootstrap_expect}"
-}
-
-resource "aws_iam_instance_profile" "discover" {
-  role = "${aws_iam_role.discover.name}"
-}
-
-resource "aws_iam_role" "discover" {
-  assume_role_policy = "${data.aws_iam_policy_document.instance-assume-role-policy.json}"
-}
-
-resource "aws_iam_role_policy" "discover" {
-  policy = "${data.aws_iam_policy_document.discover.json}"
-  role   = "${aws_iam_role.discover.id}"
 }
