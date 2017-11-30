@@ -4,7 +4,7 @@ set -e
 
 BIND_ADDR=$(curl http://169.254.169.254/latest/meta-data/local-ipv4)
 
-sudo tee /etc/consul.d/config.json > /dev/null <<EOF
+sudo tee /etc/consul.d/configuration.json > /dev/null <<EOF
 {
   "bind_addr": "$BIND_ADDR",
   "bootstrap_expect": ${bootstrap_expect},
