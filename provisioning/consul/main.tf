@@ -1,7 +1,7 @@
-data "aws_ami" "consul" {
+data "aws_ami" "default" {
   filter {
     name   = "name"
-    values = ["consul"]
+    values = ["desolate-fjord"]
   }
 
   most_recent = true
@@ -49,14 +49,41 @@ data "template_file" "consul" {
 
   vars {
     bootstrap_expect = "${var.name == "server" ? var.bootstrap_expect : 0}"
-    retry_join       = "[\"provider=aws tag_key=Name tag_value=consul-server\"]"
+    retry_join       = "[\"provider=aws tag_key=Name tag_value=default-server\"]"
     server           = "${var.name == "server" ? true : false}"
   }
 
   count = "${var.bootstrap_expect}"
 }
 
-resource "aws_security_group" "consul" {
+data "template_file" "nomad" {
+  template = "${file("${path.module}/templates/nomad.tpl")}"
+
+  vars {
+    bootstrap_expect = "${var.name == "server" ? var.bootstrap_expect : 0}"
+    client           = "${var.name == "client" ? true : false}"
+    server           = "${var.name == "server" ? true : false}"
+  }
+
+  count = "${var.bootstrap_expect}"
+}
+
+data "template_cloudinit_config" "default" {
+  base64_encode = true
+  gzip          = true
+
+  part {
+    content = "${element(data.template_file.consul.*.rendered, count.index)}"
+  }
+
+  part {
+    content = "${element(data.template_file.nomad.*.rendered, count.index)}"
+  }
+
+  count = "${var.bootstrap_expect}"
+}
+
+resource "aws_security_group" "default" {
   egress {
     cidr_blocks = ["0.0.0.0/0"]
     from_port   = 0
@@ -76,18 +103,18 @@ resource "aws_security_group" "consul" {
   }
 }
 
-resource "aws_instance" "consul" {
-  ami                  = "${data.aws_ami.consul.id}"
+resource "aws_instance" "default" {
+  ami                  = "${data.aws_ami.default.id}"
   iam_instance_profile = "${aws_iam_instance_profile.discover.name}"
   instance_type        = "t2.small"
   key_name             = "default"
-  security_groups      = ["${aws_security_group.consul.name}"]
+  security_groups      = ["${aws_security_group.default.name}"]
 
   tags = {
-    Name = "consul-${var.name}"
+    Name = "default-${var.name}"
   }
 
-  user_data = "${element(data.template_file.consul.*.rendered, count.index)}"
+  user_data = "${element(data.template_cloudinit_config.default.*.rendered, count.index)}"
 
   count = "${var.bootstrap_expect}"
 }

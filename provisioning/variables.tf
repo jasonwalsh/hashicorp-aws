@@ -2,10 +2,10 @@ variable "region" {
   default = "us-east-1"
 }
 
-variable "consul_clients" {
+variable "default_clients" {
   default = 6
 }
 
-variable "consul_servers" {
+variable "default_servers" {
   default = 3
 }

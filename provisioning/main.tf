@@ -2,16 +2,16 @@ provider "aws" {
   region = "${var.region}"
 }
 
-module "consul-client" {
+module "default-client" {
   source = "./consul"
 
-  bootstrap_expect = "${var.consul_clients}"
+  bootstrap_expect = "${var.default_clients}"
   name             = "client"
 }
 
-module "consul-server" {
+module "default-server" {
   source = "./consul"
 
-  bootstrap_expect = "${var.consul_servers}"
+  bootstrap_expect = "${var.default_servers}"
   name             = "server"
 }
