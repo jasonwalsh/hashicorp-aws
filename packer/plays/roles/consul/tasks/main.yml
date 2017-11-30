@@ -26,7 +26,7 @@
   become: yes
 
 - name: Copy consul unit configuration file
-  template: dest=/lib/systemd/system/consul.service src=consul.service.j2
+  copy: dest=/lib/systemd/system/consul.service src=consul.service
   become: yes
 
 - name: Copy dnsmasq consul configuration file
