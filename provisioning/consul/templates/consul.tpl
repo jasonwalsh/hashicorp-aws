@@ -9,7 +9,7 @@ sudo tee /etc/consul.d/config.json > /dev/null <<EOF
   "bind_addr": "$BIND_ADDR",
   "bootstrap_expect": ${bootstrap_expect},
   "client_addr": "0.0.0.0",
-  "data_dir": "/opt/consul/data",
+  "data_dir": "/var/lib/consul/data",
   "leave_on_terminate": true,
   "retry_join": ${retry_join},
   "server": ${server},
