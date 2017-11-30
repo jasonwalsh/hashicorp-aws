@@ -3,14 +3,14 @@ provider "aws" {
 }
 
 module "default-client" {
-  source = "./consul"
+  source = "./default"
 
   bootstrap_expect = "${var.default_clients}"
   name             = "client"
 }
 
 module "default-server" {
-  source = "./consul"
+  source = "./default"
 
   bootstrap_expect = "${var.default_servers}"
   name             = "server"
