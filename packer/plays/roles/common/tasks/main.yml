@@ -3,6 +3,7 @@
 - name: Install required packages
   apt: name={{ item }} state=present update_cache=yes
   with_items:
+  - dnsmasq
   - systemd
   - unzip
   become: yes

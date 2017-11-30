@@ -28,3 +28,11 @@
 - name: Copy consul unit configuration file
   template: dest=/lib/systemd/system/consul.service src=consul.service.j2
   become: yes
+
+- name: Copy dnsmasq consul configuration file
+  copy: dest=/etc/dnsmasq.d/10-consul src=10-consul
+  become: yes
+
+- name: Restart service dnsmasq
+  systemd: name=dnsmasq state=restarted
+  become: yes
