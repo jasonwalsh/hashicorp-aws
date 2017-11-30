@@ -1,7 +1,7 @@
 {
   "builders": [
     {
-      "ami_name": "consul",
+      "ami_name": "desolate-fjord",
       "force_delete_snapshot": true,
       "force_deregister": true,
       "instance_type": "t2.small",
@@ -32,7 +32,7 @@
     },
     {
       "playbook_dir": "./plays",
-      "playbook_file": "./plays/consul.yml",
+      "playbook_file": "./plays/master.yml",
       "type": "ansible-local"
     }
   ]
